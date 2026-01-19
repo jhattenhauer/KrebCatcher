@@ -3,16 +3,22 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import pathlib
 import json
+from configparser import ConfigParser
+
+cfg = ConfigParser()
+cfg.read("settings.ini")
 
 # =========================
 # CONFIG
 # =========================
-IMG_SIZE = (180, 180)
-BATCH_SIZE = 32
-EPOCHS = 5   # number of additional epochs
-DATASET_DIR = "flower_photos"  # same dataset as before
-MODEL_PATH = "image_classifier.keras"
-CLASS_NAMES_PATH = "class_names.json"
+IMG_SIZE = cfg["model"]["image_size"]
+BATCH_SIZE = cfg["model"]["batch_size"]
+EPOCHS = cfg["model"]["epochs_additional"]
+DATASET_DIR = cfg["paths"]["dataset_path"]
+MODEL_PATH = cfg["model"]["model_path"]
+CLASS_NAMES_PATH = cfg["model"]["class_names_path"]
+VALIDATION_SPLIT = cfg["model"]["validation_split"]
+TRAINING_SEED = cfg["model"]["training_seed"]
 
 # =========================
 # LOAD DATASET
@@ -21,18 +27,18 @@ data_dir = pathlib.Path(DATASET_DIR)
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
-    validation_split=0.2,
+    validation_split=VALIDATION_SPLIT,
     subset="training",
-    seed=123,
+    seed=TRAINING_SEED,
     image_size=IMG_SIZE,
     batch_size=BATCH_SIZE,
 )
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
-    validation_split=0.2,
+    validation_split=VALIDATION_SPLIT,
     subset="validation",
-    seed=123,
+    seed=TRAINING_SEED,
     image_size=IMG_SIZE,
     batch_size=BATCH_SIZE,
 )

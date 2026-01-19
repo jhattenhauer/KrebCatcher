@@ -3,18 +3,31 @@ import numpy as np
 import os 
 import PIL 
 import json
+from configparser import ConfigParser
 import tensorflow as tf 
 from tensorflow import keras 
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential
 
-DATASET_DIR = "flower_photos"  
-MODEL_PATH = "image_classifier.keras"
-CLASS_NAMES_PATH = "class_names.json"
+cfg = ConfigParser()
+cfg.read("settings.ini")
+
+# =========================
+# CONFIG
+# =========================
+IMG_SIZE = cfg["model"]["image_size"]
+BATCH_SIZE = cfg["model"]["batch_size"]
+EPOCHS = cfg["model"]["initial"]
+DATASET_DIR = cfg["paths"]["dataset_path"]
+MODEL_PATH = cfg["model"]["model_path"]
+CLASS_NAMES_PATH = cfg["model"]["class_names_path"]
+VALIDATION_SPLIT = cfg["model"]["validation_split"]
+TRAINING_SEED = cfg["model"]["training_seed"]
+ACTIVATION_METHOD = cfg['model']["neuron_activation_method"]
+MODEL_OPTIMIZATION = cfg["model"]["model_optimizer"]
 
 import pathlib 
-data_dir = "./dataset/"
-data_dir = pathlib.Path(data_dir)
+data_dir = pathlib.Path(DATASET_DIR)
 if not os.path.exists(data_dir):
     raise FileNotFoundError(f"Dataset directory not found at: {data_dir}")
 
@@ -28,19 +41,19 @@ if image_count == 0:
 
 train_ds = tf.keras.utils.image_dataset_from_directory( 
 	data_dir, 
-	validation_split=0.2, 
+	validation_split=VALIDATION_SPLIT, 
 	subset="training", 
-	seed=123, 
-	image_size=(180, 180), 
-	batch_size=32)
+	seed=TRAINING_SEED, 
+	image_size=IMG_SIZE, 
+	batch_size=BATCH_SIZE)
 
 val_ds = tf.keras.utils.image_dataset_from_directory( 
 	data_dir, 
-	validation_split=0.2, 
+	validation_split=VALIDATION_SPLIT, 
 	subset="validation", 
-	seed=123, 
-	image_size=(180,180), 
-	batch_size=32)
+	seed=TRAINING_SEED, 
+	image_size=IMG_SIZE, 
+	batch_size=BATCH_SIZE)
 
 class_names = train_ds.class_names 
 print(class_names)
@@ -63,25 +76,25 @@ num_classes = len(class_names)
 
 model = Sequential([ 
 	layers.Rescaling(1./255, input_shape=(180,180, 3)), 
-	layers.Conv2D(16, 3, padding='same', activation='relu'), 
+	layers.Conv2D(16, 3, padding='same', activation=ACTIVATION_METHOD), 
 	layers.MaxPooling2D(), 
-	layers.Conv2D(32, 3, padding='same', activation='relu'), 
+	layers.Conv2D(32, 3, padding='same', activation=ACTIVATION_METHOD), 
 	layers.MaxPooling2D(), 
-	layers.Conv2D(64, 3, padding='same', activation='relu'), 
+	layers.Conv2D(64, 3, padding='same', activation=ACTIVATION_METHOD), 
 	layers.MaxPooling2D(), 
 	layers.Flatten(), 
-	layers.Dense(128, activation='relu'), 
+	layers.Dense(128, activation=ACTIVATION_METHOD), 
 	layers.Dense(num_classes) 
 ])
 
-model.compile(optimizer='adam', 
+model.compile(optimizer=MODEL_OPTIMIZATION, 
 	loss=tf.keras.losses.SparseCategoricalCrossentropy( 
 	from_logits=True), 
 	metrics=['accuracy']) 
 
 model.summary()
 
-epochs=10
+epochs=EPOCHS
 history = model.fit( 
 train_ds, 
 validation_data=val_ds, 

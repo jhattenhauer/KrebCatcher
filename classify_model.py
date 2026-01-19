@@ -3,12 +3,16 @@ import numpy as np
 import os 
 import PIL 
 import json
+from configparser import ConfigParser
 import tensorflow as tf 
 from tensorflow import keras 
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential
 
-model = keras.models.load_model("image_classifier.keras")
+cfg = ConfigParser()
+cfg.read("settings.ini")
+
+model = keras.models.load_model(cfg["paths"]["model_path"])
 
 with open("class_names.json", "r") as f:
     class_names = json.load(f)
