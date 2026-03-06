@@ -9,3 +9,19 @@ KrebsCatcher is an open source cancer detection model.
 - Tensorflow
 - PIL
 - Matplotlib
+
+  ## TODO ##
+Write into docker container
+  - Add gpu passthrough
+  - intstall dependancies
+  - host webpage
+
+Webpages
+  - Add tools for highlighting tumors
+  - add support for tcia api?
+  - visualizing page
+    
+split into 3 main pages?
+detect
+train
+settings
