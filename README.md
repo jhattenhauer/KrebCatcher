@@ -1,14 +1,8 @@
 # KrebsCatcher #
 
-KrebsCatcher is an open source cancer detection model.
+KrebsCatcher will be a open source cancer detection tool.
+
 *Dedicated to Someone very special, who always reminds me to be the best I can.*
-
-## Packages ##
-
-- OpenCV
-- Tensorflow
-- PIL
-- Matplotlib
 
   ## TODO ##
 Write into docker container
